@@ -1,0 +1,21 @@
+﻿@model Veterinaria_AppWeb.Models.Turno
+<h2>Detalle Turno</h2>
+
+<dl class="row">
+    <dt class="col-sm-2">Fecha</dt>
+    <dd class="col-sm-10">@Model.Dia.ToString("dd/MM/yyyy")</dd>
+
+    <dt class="col-sm-2">Horario</dt>
+    <dd class="col-sm-10">@Model.Horario.ToString(@"hh\:mm")</dd>
+
+    <dt class="col-sm-2">Cliente</dt>
+    <dd class="col-sm-10">@Model.NombreCliente</dd>
+
+    <dt class="col-sm-2">Teléfono</dt>
+    <dd class="col-sm-10">@Model.Telefono</dd>
+
+    <dt class="col-sm-2">Servicio</dt>
+    <dd class="col-sm-10">@Model.Servicio?.Nombre</dd>
+</dl>
+
+<a asp-action="Index" class="btn btn-secondary">Volver</a>

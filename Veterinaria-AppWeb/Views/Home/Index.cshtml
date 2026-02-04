@@ -1,0 +1,82 @@
+﻿@model Veterinaria_AppWeb.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Inicio";
+}
+
+<!-- Encabezado -->
+<div class="text-center mb-5">
+    <h1 class="display-5 fw-bold text-primary">🐾 Veterinaria Díaz</h1>
+    <p class="text-muted">Panel de control semanal</p>
+</div>
+
+<div class="row g-4">
+    <!-- Productos con bajo stock -->
+    <div class="col-lg-6">
+        <h4 class="mb-3 text-danger">⚠ Productos con bajo stock</h4>
+        @if (!Model.ProductosBajoStock.Any())
+        {
+            <div class="alert alert-success small">
+                Todos los productos tienen stock suficiente.
+            </div>
+        }
+        else
+        {
+            <table class="table table-sm table-striped align-middle shadow-sm rounded">
+                <thead class="table-light">
+                    <tr>
+                        <th>Producto</th>
+                        <th class="text-end">Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.ProductosBajoStock)
+                    {
+                        <tr>
+                            <td>@p.Nombre</td>
+                            <td class="text-end fw-bold @(p.Stock <= 5 ? "text-danger" : "text-warning")">
+                                @p.Stock
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+
+    <!-- Turnos de la semana -->
+    <div class="col-lg-6">
+        <h4 class="mb-3 text-primary">📅 Turnos de la semana</h4>
+        @if (!Model.TurnosSemana.Any())
+        {
+            <div class="alert alert-info small">
+                No hay turnos programados para esta semana.
+            </div>
+        }
+        else
+        {
+            <table class="table table-sm table-hover align-middle shadow-sm rounded">
+                <thead class="table-light">
+                    <tr>
+                        <th>Fecha y hora</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Servicio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.TurnosSemana)
+                    {
+                        var fechaHora = t.Dia.Add(t.Horario);
+                        var vencido = fechaHora < DateTime.Now;
+                        <tr class="@(vencido ? "table-danger" : "")">
+                            <td>@fechaHora.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@t.NombreCliente</td>
+                            <td>@t.Telefono</td>
+                            <td>@t.Servicio?.Nombre</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

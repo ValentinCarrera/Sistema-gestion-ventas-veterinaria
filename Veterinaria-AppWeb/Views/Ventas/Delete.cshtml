@@ -1,0 +1,25 @@
+﻿@model Veterinaria_AppWeb.Models.Venta
+
+@{
+    ViewData["Title"] = "Eliminar Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-danger mb-4">Eliminar Venta</h2>
+
+<div class="alert alert-warning">
+    ⚠ Atención: Esta acción eliminará la venta y todos sus detalles.
+</div>
+
+<div class="mb-3">
+    <strong>Fecha:</strong> @Model.Fecha.ToString("dd/MM/yyyy HH:mm") <br />
+    <strong>Forma de pago:</strong> @Model.FormaDePago <br />
+    <strong>Total:</strong> @Model.MontoTotal.ToString("C")
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id_venta" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    
+</form>

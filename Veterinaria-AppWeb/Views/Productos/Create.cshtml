@@ -1,0 +1,20 @@
+﻿@model Veterinaria_AppWeb.ViewModels.ProductoViewModel
+@{
+    ViewData["Title"] = "Crear Producto";
+}
+
+<h1>Crear Producto</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    @await Html.PartialAsync("ProductoForm", Model)
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

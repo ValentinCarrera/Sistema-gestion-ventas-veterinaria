@@ -1,0 +1,14 @@
+﻿@model Veterinaria_AppWeb.ViewModels.ServicioViewModel
+
+<h2>Editar Servicio</h2>
+
+<form asp-action="Edit" method="post">
+    @Html.AntiForgeryToken()
+     
+    <input type="hidden" asp-for="Id_Servicio" />
+
+    <partial name="ServicioForm" model="Model" />
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

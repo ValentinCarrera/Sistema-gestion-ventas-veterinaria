@@ -1,0 +1,217 @@
+﻿@model Veterinaria_AppWeb.ViewModels.VentaViewModel
+@using Microsoft.AspNetCore.Mvc.ViewFeatures
+@{
+    ViewData["Title"] = "Registrar Venta";
+}
+
+<h1>Registrar Venta</h1>
+
+<form asp-action="Create" method="post" id="ventaForm">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="FormaDePago" class="form-label">Método de pago</label>
+        <select asp-for="FormaDePago" asp-items="Model.MetodosPago" class="form-select"></select>
+        <span asp-validation-for="FormaDePago" class="text-danger"></span>
+    </div>
+
+    <h4>Detalles de la venta</h4>
+
+    <div id="detalles-container">
+        @for (int i = 0; i < Model.Detalles.Count; i++)
+        {
+            var vd = new ViewDataDictionary(ViewData)
+            {
+                TemplateInfo = { HtmlFieldPrefix = $"Detalles[{i}]" }
+            };
+            @await Html.PartialAsync("DetalleVentaForm", Model.Detalles[i], vd)
+        }
+    </div>
+
+    <button type="button" id="btnAddItem" class="btn btn-secondary mb-3">➕ Agregar Ítem</button>
+
+    <div class="mb-3">
+        <strong>Total:</strong> <span id="total">
+            @Model.Detalles.Sum(d => d.Cantidad * d.PrecioUnitario).ToString("C")
+        </span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Venta</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+<!-- Template oculto -->
+<div id="detalle-template" class="d-none">
+    @{
+        var vdTpl = new ViewDataDictionary(ViewData)
+        {
+            TemplateInfo = { HtmlFieldPrefix = "Detalles[__index__]" }
+        };
+        var modelForTpl = new Veterinaria_AppWeb.ViewModels.DetalleVentaViewModel
+        {
+            ProductosDisponibles = Model.Productos,
+            ServiciosDisponibles = Model.Servicios
+        };
+    }
+    @await Html.PartialAsync("DetalleVentaForm", modelForTpl, vdTpl)
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+
+    <script>
+        let detalleIndex = @Model.Detalles.Count;
+
+        // --- Helpers para hidden-preservation ---
+        function findHiddenCopy(card, name) {
+            return Array.from(card.querySelectorAll('input.hidden-copy')).find(i => i.getAttribute('name') === name);
+        }
+
+        function addHiddenIfMissing(card, selectEl) {
+            if (!selectEl) return;
+            if (!selectEl.disabled) return; // solo cuando está disabled
+            const name = selectEl.getAttribute('name');
+            if (!name) return;
+
+            let hidden = findHiddenCopy(card, name);
+            if (!hidden) {
+                hidden = document.createElement('input');
+                hidden.type = 'hidden';
+                hidden.className = 'hidden-copy';
+                hidden.name = name;
+                hidden.value = selectEl.value || '';
+                card.appendChild(hidden);
+            } else {
+                hidden.value = selectEl.value || '';
+            }
+        }
+
+        function removeHidden(card, selectEl) {
+            if (!selectEl) return;
+            const name = selectEl.getAttribute('name');
+            if (!name) return;
+            const hidden = findHiddenCopy(card, name);
+            if (hidden) hidden.remove();
+        }
+
+        // --- Lógica de toggle por tarjeta (única fuente de verdad en cliente) ---
+        function toggleInputsForCard(card) {
+            const prod = card.querySelector('.producto-select');
+            const serv = card.querySelector('.servicio-select');
+            if (!prod || !serv) return;
+
+            if (prod.value && prod.value.trim() !== '') {
+                // hay producto -> bloquear servicio
+                serv.disabled = true;
+                addHiddenIfMissing(card, serv);
+                removeHidden(card, prod); // prod está activo, no necesita hidden
+            } else if (serv.value && serv.value.trim() !== '') {
+                prod.disabled = true;
+                addHiddenIfMissing(card, prod);
+                removeHidden(card, serv);
+            } else {
+                // ninguno elegido -> ambos habilitados y quitar hidden si existe
+                prod.disabled = false;
+                serv.disabled = false;
+                removeHidden(card, prod);
+                removeHidden(card, serv);
+            }
+        }
+
+        function initCard(card) {
+            // Inicializa estado visual y hidden según valores actuales
+            toggleInputsForCard(card);
+        }
+
+        // Inicializar tarjetas ya renderizadas por servidor
+        document.querySelectorAll('#detalles-container .detalle-venta').forEach(initCard);
+
+        // --- Agregar nuevo ítem desde template ---
+        document.getElementById("btnAddItem").addEventListener("click", function () {
+            const container = document.getElementById("detalles-container");
+            const templateHtml = document.getElementById("detalle-template").innerHTML;
+            const html = templateHtml.replace(/__index__/g, detalleIndex);
+            detalleIndex++;
+            const wrapper = document.createElement("div");
+            wrapper.innerHTML = html;
+            container.appendChild(wrapper);
+
+            // inicializar cada nuevo detalle agregado
+            wrapper.querySelectorAll('.detalle-venta').forEach(initCard);
+
+            reindexarDetalles(); // mantiene indices consistentes
+            calcularTotal();
+        });
+
+        // --- Delegación: cambio en selects (producto/servicio) ---
+        document.getElementById("detalles-container").addEventListener("change", function (e) {
+            if (e.target.classList.contains("producto-select") || e.target.classList.contains("servicio-select")) {
+                const card = e.target.closest(".detalle-venta");
+                toggleInputsForCard(card);
+            }
+        });
+
+        // ➖ Quitar ítem con reindexado (mantener tu comportamiento)
+        document.getElementById("detalles-container").addEventListener("click", function (e) {
+            if (e.target.classList.contains("btn-remove-item")) {
+                const container = document.getElementById("detalles-container");
+                const card = e.target.closest(".detalle-venta");
+                if (card) {
+                    card.remove();
+                    reindexarDetalles();
+                    calcularTotal();
+                }
+            }
+        });
+
+        function reindexarDetalles() {
+            const container = document.getElementById("detalles-container");
+            const cards = container.querySelectorAll(".detalle-venta");
+
+            cards.forEach((card, idx) => {
+                // Reemplaza name/id/for usando patrones (tu versión previa ya hacía esto)
+                card.querySelectorAll("[name], [id], [for]").forEach(el => {
+                    if (el.name) {
+                        el.name = el.name.replace(/Detalles\[\d+\]/, `Detalles[${idx}]`);
+                    }
+                    if (el.id) {
+                        el.id = el.id.replace(/Detalles_\d+__/, `Detalles_${idx}__`);
+                    }
+                    if (el.htmlFor) {
+                        el.htmlFor = el.htmlFor.replace(/Detalles_\d+__/, `Detalles_${idx}__`);
+                    }
+                });
+            });
+
+            // Actualiza contador global
+            detalleIndex = cards.length;
+        }
+
+        // --- Calcular total (tu función, inalterada) ---
+        function calcularTotal() {
+            let total = 0;
+            document.querySelectorAll("#detalles-container .detalle-venta").forEach(card => {
+                const cantEl = card.querySelector("[name*='.Cantidad']");
+                const precioEl = card.querySelector("[name*='.PrecioUnitario']");
+                const cant = cantEl ? parseFloat(cantEl.value) || 0 : 0;
+                const precio = precioEl ? parseFloat(precioEl.value) || 0 : 0;
+                total += cant * precio;
+            });
+            const formatter = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' });
+            document.getElementById("total").textContent = formatter.format(total);
+        }
+
+        // recalcular total al cambiar cantidad o precio
+        document.getElementById("ventaForm").addEventListener("input", function (e) {
+            if (e.target.matches("[name*='Cantidad']") || e.target.matches("[name*='PrecioUnitario']")) {
+                calcularTotal();
+            }
+        });
+
+        // Inicializar total al cargar la página
+        calcularTotal();
+    </script>
+
+}

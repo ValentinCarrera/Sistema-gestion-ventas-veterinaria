@@ -1,0 +1,37 @@
+﻿@model Veterinaria_AppWeb.ViewModels.TurnoViewModel
+
+<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+<div class="mb-3">
+    <label asp-for="NombreCliente" class="form-label"></label>
+    <input asp-for="NombreCliente" class="form-control" />
+    <span asp-validation-for="NombreCliente" class="text-danger"></span>
+</div>
+
+<div class="mb-3">
+    <label asp-for="Telefono" class="form-label"></label>
+    <input asp-for="Telefono" class="form-control" />
+    <span asp-validation-for="Telefono" class="text-danger"></span>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <label asp-for="Dia" class="form-label"></label>
+        <input asp-for="Dia" type="date" class="form-control" />
+        <span asp-validation-for="Dia" class="text-danger"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="Horario" class="form-label"></label>
+        <input asp-for="Horario" type="time" class="form-control" />
+        <span asp-validation-for="Horario" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="mb-3 mt-3">
+    <label asp-for="Id_Servicio" class="form-label"></label>
+    <select asp-for="Id_Servicio" asp-items="Model.ServiciosDisponibles" class="form-select">
+        <option value="">-- Seleccione Servicio --</option>
+    </select>
+    <span asp-validation-for="Id_Servicio" class="text-danger"></span>
+</div>

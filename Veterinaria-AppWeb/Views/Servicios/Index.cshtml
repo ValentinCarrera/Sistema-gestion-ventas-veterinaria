@@ -1,0 +1,31 @@
+﻿@model IEnumerable<Veterinaria_AppWeb.ViewModels.ServicioViewModel>
+
+<h2>Servicios</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">➕ Nuevo Servicio</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Nombre)</th>
+            <th>@Html.DisplayNameFor(model => model.Descripcion)</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Descripcion</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id_Servicio" class="btn btn-info btn-sm">👁️ Ver</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id_Servicio" class="btn btn-warning btn-sm">✏️ Editar</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id_Servicio" class="btn btn-danger btn-sm">🗑️ Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

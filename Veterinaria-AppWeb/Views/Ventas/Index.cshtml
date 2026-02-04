@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Veterinaria_AppWeb.Models.Venta>
+@using System.Globalization
+@{
+    ViewData["Title"] = "Ventas del Día";
+    // Cultura para pesos argentinos
+    var ars = new CultureInfo("es-AR");
+}
+
+<h1 class="mb-4">Ventas</h1>
+
+<!-- Botón de nueva venta -->
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">
+        ➕ Nueva Venta
+    </a>
+</div>
+
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-auto">
+        <label for="fecha" class="form-label">Fecha</label>
+        <input type="date" id="fecha" name="fecha"
+               class="form-control"
+               value="@ViewBag.FechaFiltro" />
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-secondary">Hoy</a>
+    </div>
+</form>
+
+<div class="mb-4">
+    <h4>Totales del día (@ViewBag.FechaFiltro)</h4>
+    <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between">
+            <strong>Total Ventas:</strong>
+            <span>@(((decimal)ViewBag.TotalDia).ToString("C", ars))</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            Efectivo: <span>@(((decimal)ViewBag.TotalEfectivo).ToString("C", ars))</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            Débito: <span>@(((decimal)ViewBag.TotalDebito).ToString("C", ars))</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            Crédito: <span>@(((decimal)ViewBag.TotalCredito).ToString("C", ars))</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between">
+            Transferencia: <span>@(((decimal)ViewBag.TotalTransferencia).ToString("C", ars))</span>
+        </li>
+    </ul>
+</div>
+
+<table class="table table-striped table-bordered align-middle">
+    <thead class="table-light">
+        <tr>
+            <th>Fecha</th>
+            <th>Método de Pago</th>
+            <th>Total</th>
+            <th>Detalles</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Any())
+        {
+            foreach (var v in Model)
+            {
+                <tr>
+                    <td>@v.Fecha.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@v.FormaDePago</td>
+                    <td>@v.MontoTotal.ToString("C", ars)</td>
+                    <td>
+                        <ul class="mb-0">
+                            @foreach (var d in v.Detalles)
+                            {
+                                if (d.Producto != null)
+                                {
+                                    <li>@d.Cantidad x @d.Producto.Nombre (@d.PrecioUnitario.ToString("C", ars))</li>
+                                }
+                                else if (d.Servicio != null)
+                                {
+                                    <li>@d.Cantidad x @d.Servicio.Nombre (@d.PrecioUnitario.ToString("C", ars))</li>
+                                }
+                            }
+                        </ul>
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@v.Id_venta" class="btn btn-sm btn-info">Detalles</a>
+                        <a asp-action="Delete" asp-route-id="@v.Id_venta" class="btn btn-sm btn-danger">Eliminar</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr><td colspan="5" class="text-center">No hay ventas para esta fecha.</td></tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,59 @@
+﻿@model IEnumerable<Veterinaria_AppWeb.ViewModels.ProductoViewModel>
+@{
+    ViewData["Title"] = "Productos";
+}
+
+<h1>Productos</h1>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Crear nuevo producto</a>
+</p>
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="text" name="search" class="form-control"
+               placeholder="Buscar por nombre o categoría"
+               value="@ViewBag.Search" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Buscar</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Limpiar</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th class="text-end">Stock</th>
+            <th class="text-end">Precio</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Nombre</td>
+                <td>@p.Categoria</td>
+                <td class="text-end">@p.Stock</td>
+                <td class="text-end">@p.Precio.ToString("C")</td>
+                <td>
+                    <a class="btn btn-sm btn-info" asp-action="Details" asp-route-id="@p.Id_Producto">Ver</a>
+                    <a class="btn btn-sm btn-warning" asp-action="Edit" asp-route-id="@p.Id_Producto">Editar</a>
+                    <a class="btn btn-sm btn-danger" asp-action="Delete" asp-route-id="@p.Id_Producto">Eliminar</a>
+                    <a class="btn btn-sm btn-success" asp-action="Reponer" asp-route-id="@p.Id_Producto">Reponer Stock</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

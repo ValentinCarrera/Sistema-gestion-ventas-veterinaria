@@ -1,0 +1,77 @@
+﻿@model Veterinaria_AppWeb.ViewModels.VentaViewModel
+
+@{
+    ViewData["Title"] = "Editar Venta";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-primary mb-4">@ViewData["Title"]</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id_venta" />
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label asp-for="FormaDePago" class="form-label fw-bold">Forma de Pago</label>
+            <select asp-for="FormaDePago" class="form-select">
+                <option value="">-- Seleccione --</option>
+                <option>Efectivo</option>
+                <option>Débito</option>
+                <option>Crédito</option>
+                <option>Transferencia</option>
+            </select>
+            <span asp-validation-for="FormaDePago" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Fecha" class="form-label fw-bold">Fecha</label>
+            <input asp-for="Fecha" class="form-control" type="datetime-local" value="@Model.Fecha.ToString("yyyy-MM-ddTHH:mm")" />
+            <span asp-validation-for="Fecha" class="text-danger"></span>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Detalles de la Venta</h4>
+    <div id="detalles-venta">
+        @for (int i = 0; i < Model.Detalles.Count; i++)
+        {
+            <partial name="_DetalleVentaForm" model="Model.Detalles[i]" />
+        }
+    </div>
+
+    <button type="button" id="btn-add-detalle" class="btn btn-success mb-3">➕ Agregar Detalle</button>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-action="Index" class="btn btn-secondary">⬅ Volver</a>
+        <button type="submit" class="btn btn-primary">💾 Guardar Cambios</button>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        let detallesCount = @Model.Detalles.Count;
+
+        document.getElementById('btn-add-detalle').addEventListener('click', function () {
+            let template = document.querySelector('#detalles-venta .detalle-venta').cloneNode(true);
+
+            template.querySelectorAll('input, select').forEach(function (input) {
+                if (input.tagName === "SELECT") {
+                    input.selectedIndex = 0;
+                } else {
+                    input.value = '';
+                }
+                let name = input.getAttribute('asp-for');
+                if (name) {
+                    input.setAttribute('name', `Detalles[${detallesCount}].${name}`);
+                    input.setAttribute('id', `Detalles_${detallesCount}__${name}`);
+                }
+            });
+
+            document.getElementById('detalles-venta').appendChild(template);
+            detallesCount++;
+        });
+    </script>
+}

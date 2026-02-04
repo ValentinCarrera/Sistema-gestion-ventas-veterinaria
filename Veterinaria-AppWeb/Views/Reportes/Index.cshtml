@@ -1,0 +1,68 @@
+﻿@model Veterinaria_AppWeb.ViewModels.ReporteMensualViewModel
+@using System.Globalization
+@{
+    ViewData["Title"] = "Reporte Mensual";
+    var ars = new CultureInfo("es-AR");
+}
+
+<h1 class="mb-4">Reporte Mensual</h1>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-auto">
+        <label class="form-label">Mes</label>
+        <select name="mes" class="form-select">
+            @foreach (var m in ViewBag.Meses)
+            {
+                <option value="@m.Value" selected="@m.Selected">@m.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto">
+        <label class="form-label">Año</label>
+        <select name="año" class="form-select">
+            @foreach (var a in ViewBag.Años)
+            {
+                <option value="@a.Value" selected="@a.Selected">@a.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-auto align-self-end">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-light">
+        <tr>
+            <th>Día</th>
+            <th>Total</th>
+            <th>Efectivo</th>
+            <th>Débito</th>
+            <th>Crédito</th>
+            <th>Transferencia</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var d in Model.DetallePorDia)
+        {
+            <tr>
+                <td>@d.Dia.ToString("dd/MM/yyyy")</td>
+                <td>@d.Total.ToString("C", ars)</td>
+                <td>@d.Efectivo.ToString("C", ars)</td>
+                <td>@d.Debito.ToString("C", ars)</td>
+                <td>@d.Credito.ToString("C", ars)</td>
+                <td>@d.Transferencia.ToString("C", ars)</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot class="table-secondary fw-bold">
+        <tr>
+            <td>Total Mes</td>
+            <td>@Model.TotalMes.ToString("C", ars)</td>
+            <td>@Model.TotalEfectivo.ToString("C", ars)</td>
+            <td>@Model.TotalDebito.ToString("C", ars)</td>
+            <td>@Model.TotalCredito.ToString("C", ars)</td>
+            <td>@Model.TotalTransferencia.ToString("C", ars)</td>
+        </tr>
+    </tfoot>
+</table>

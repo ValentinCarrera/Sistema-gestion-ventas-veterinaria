@@ -1,0 +1,17 @@
+﻿@model Veterinaria_AppWeb.ViewModels.TurnoViewModel
+@{
+    ViewData["Title"] = "Crear Turno";
+}
+
+<h2>Crear Turno</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <partial name="TurnoForm" model="Model" />
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a asp-action="Index" class="btn btn-secondary">Volver</a>
+</form>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

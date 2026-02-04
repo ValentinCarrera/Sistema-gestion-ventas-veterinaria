@@ -1,0 +1,23 @@
+﻿@model Veterinaria_AppWeb.Models.Turno
+<h2>Eliminar Turno</h2>
+
+<div class="mb-3">
+    <p>¿Seguro que querés eliminar este turno?</p>
+    <dl>
+        <dt>Fecha</dt>
+        <dd>@Model.Dia.ToString("dd/MM/yyyy")</dd>
+        <dt>Horario</dt>
+        <dd>@Model.Horario.ToString(@"hh\:mm")</dd>
+        <dt>Cliente</dt>
+        <dd>@Model.NombreCliente</dd>
+        <dt>Servicio</dt>
+        <dd>@Model.Servicio?.Nombre</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.Id_Turno" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

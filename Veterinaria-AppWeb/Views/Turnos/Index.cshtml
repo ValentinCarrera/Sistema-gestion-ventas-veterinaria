@@ -1,0 +1,76 @@
+﻿@model IEnumerable<Veterinaria_AppWeb.Models.Turno>
+@{
+    ViewData["Title"] = "Turnos del Mes";
+    int selYear = ViewBag.SelYear;
+    int selMonth = ViewBag.SelMonth;
+}
+
+<h2>Turnos del mes @selMonth/@selYear</h2>
+
+<form asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <label for="year" class="form-label">Año</label>
+        <input type="number" class="form-control" name="year" id="year" value="@selYear" min="2000" max="2100" />
+    </div>
+    <div class="col-auto">
+        <label for="month" class="form-label">Mes</label>
+        <select class="form-select" name="month" id="month">
+            @{
+                for (int m = 1; m <= 12; m++)
+                {
+                    <option value="@m" selected="@(m == selMonth)">
+                        @System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(m)
+                    </option>
+                    ;
+                }
+            }
+        </select>
+    </div>
+    <div class="col-auto align-self-end">
+        <button class="btn btn-primary">Filtrar</button>
+        <a asp-action="Index" class="btn btn-secondary">Mes actual</a>
+    </div>
+</form>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">➕ Nuevo Turno</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Día</th>
+            <th>Hora</th>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>Servicio</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        
+        @foreach (var t in Model)
+        {
+            // Combinar la fecha (Dia) con el horario para saber la fecha y hora exactas del turno
+            var turnoDateTime = t.Dia.Date + t.Horario;
+            bool turnoPasado = turnoDateTime < DateTime.Now;
+
+            // Si el turno ya pasó, agregamos la clase 'table-danger'
+            string rowClass = turnoPasado ? "table-danger" : "";
+
+            <tr class="@rowClass">
+                <td>@t.Dia.ToString("dd/MM/yyyy")</td>
+                <td>@t.Horario.ToString(@"hh\:mm")</td>
+                <td>@t.NombreCliente</td>
+                <td>@t.Telefono</td>
+                <td>@t.Servicio?.Nombre</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@t.Id_Turno" class="btn btn-sm btn-info">Detalles</a>
+                    <a asp-action="Edit" asp-route-id="@t.Id_Turno" class="btn btn-sm btn-warning">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@t.Id_Turno" class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+
+</table>

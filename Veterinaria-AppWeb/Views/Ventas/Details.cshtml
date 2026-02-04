@@ -1,0 +1,84 @@
+﻿@model Veterinaria_AppWeb.Models.Venta
+
+@{
+    ViewData["Title"] = "Detalles de Venta";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>Venta #@Model.Id_venta</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id_venta)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id_venta)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Fecha)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Fecha)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.MontoTotal)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.MontoTotal)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.FormaDePago)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.FormaDePago)
+        </dd>
+    </dl>
+
+    <h4>Detalles</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tipo</th>
+                <th>Item</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var detalle in Model.Detalles)
+            {
+                <tr>
+                    <td>
+                        @if (detalle.Id_producto.HasValue)
+                        {
+                            <span>Producto</span>
+                        }
+                        else if (detalle.Id_servicio.HasValue)
+                        {
+                            <span>Servicio</span>
+                        }
+                    </td>
+                    <td>
+                        @if (detalle.Producto != null)
+                        {
+                            @detalle.Producto.Nombre
+                        }
+                        else if (detalle.Servicio != null)
+                        {
+                            @detalle.Servicio.Nombre
+                        }
+                    </td>
+                    <td>@detalle.Cantidad</td>
+                    <td>@detalle.PrecioUnitario.ToString("C")</td>
+                    <td>@((detalle.Cantidad * detalle.PrecioUnitario).ToString("C"))</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>    
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div>

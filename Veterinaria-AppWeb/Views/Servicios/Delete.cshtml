@@ -1,0 +1,21 @@
+﻿@model Veterinaria_AppWeb.ViewModels.ServicioViewModel
+
+<h2>Eliminar Servicio</h2>
+
+<h4>¿Estás seguro que deseas eliminar este servicio?</h4>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Nombre</dt>
+        <dd class="col-sm-10">@Model.Nombre</dd>
+
+        <dt class="col-sm-2">Descripción</dt>
+        <dd class="col-sm-10">@Model.Descripcion</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id_Servicio" />
+    <button type="submit" class="btn btn-danger">🗑️ Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">⬅️ Cancelar</a>
+</form>
